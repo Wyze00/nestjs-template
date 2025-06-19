@@ -4,7 +4,9 @@ import { NestExpressApplication } from '@nestjs/platform-express';
 import { WINSTON_MODULE_NEST_PROVIDER } from 'nest-winston';
 import { Logger } from 'winston';
 import { ConfigService } from '@nestjs/config';
-import { ValidationPipe } from '@nestjs/common';
+import { HttpException, HttpStatus, ValidationPipe } from '@nestjs/common';
+import { ValidationError } from 'class-validator';
+import { ErrorFilter } from './common/filter/error.filter';
 
 async function bootstrap() {
     const app = await NestFactory.create<NestExpressApplication>(AppModule);
@@ -17,8 +19,26 @@ async function bootstrap() {
         new ValidationPipe({
             whitelist: true,
             transform: true,
+            exceptionFactory: (e: ValidationError[]) => {
+                return new HttpException(
+                    e
+                        .map((err: ValidationError) => {
+                            if (err.constraints) {
+                                return Object.values(err.constraints).join(
+                                    ', ',
+                                );
+                            }
+                            return `Invalid field: ${err.property}`;
+                        })
+                        .join(', '),
+                    HttpStatus.BAD_REQUEST,
+                );
+            },
         }),
     );
+
+    // Use Filter
+    app.useGlobalFilters(new ErrorFilter());
 
     // Use Logger
     const logger: Logger = app.get(WINSTON_MODULE_NEST_PROVIDER);
