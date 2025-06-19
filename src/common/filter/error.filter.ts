@@ -3,6 +3,7 @@ import {
     Catch,
     ExceptionFilter,
     HttpException,
+    HttpStatus,
 } from '@nestjs/common';
 import { Response } from 'express';
 
@@ -16,7 +17,7 @@ export class ErrorFilter implements ExceptionFilter {
                 errors: exception.getResponse(),
             });
         } else {
-            response.status(500).json({
+            response.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
                 errors: exception.message,
             });
         }

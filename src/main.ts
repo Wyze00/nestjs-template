@@ -49,7 +49,7 @@ async function bootstrap() {
     const PORT = configService.get<number>('PORT') || 3000;
     const HOST = configService.get<string>('HOST') || 'localhost';
 
-    await app.listen(PORT || 3000, () => {
+    await app.listen(PORT, () => {
         console.log(`Application start at : http://${HOST}:${PORT}`);
     });
 }
