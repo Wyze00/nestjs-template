@@ -49,16 +49,16 @@ async function bootstrap() {
         }),
     );
 
-    // Use Filter
-    app.useGlobalFilters(new ErrorFilter());
-
     // Use Logger
     const logger: Logger = app.get(WINSTON_MODULE_NEST_PROVIDER);
     const loggerInstance: Logger = app.get(WINSTON_MODULE_PROVIDER);
+    app.useLogger(logger);
+
+    // Use Filter
+    app.useGlobalFilters(new ErrorFilter(loggerInstance));
 
     // Use Interceptor
     app.useGlobalInterceptors(new ResponseInterceptor(loggerInstance));
-    app.useLogger(logger);
 
     // Configuration
     const configService: ConfigService = app.get(ConfigService);
