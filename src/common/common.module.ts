@@ -4,6 +4,7 @@ import { WinstonModule } from 'nest-winston';
 import * as winston from 'winston';
 import { PrismaService } from './prisma.service';
 import { JwtModule } from '@nestjs/jwt';
+import { ThrottlerModule } from '@nestjs/throttler';
 
 @Global()
 @Module({
@@ -31,6 +32,14 @@ import { JwtModule } from '@nestjs/jwt';
                 };
             },
             inject: [ConfigService],
+        }),
+        ThrottlerModule.forRoot({
+            throttlers: [
+                {
+                    ttl: 60000,
+                    limit: 100,
+                },
+            ],
         }),
     ],
     providers: [PrismaService],
