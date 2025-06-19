@@ -9,6 +9,7 @@ import { ValidationError } from 'class-validator';
 import { ErrorFilter } from './common/filter/error.filter';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import helmet from 'helmet';
+import { ResponseInterceptor } from './common/interceptor/response.interceptor';
 
 async function bootstrap() {
     const app = await NestFactory.create<NestExpressApplication>(AppModule);
@@ -47,6 +48,9 @@ async function bootstrap() {
 
     // Use Filter
     app.useGlobalFilters(new ErrorFilter());
+
+    // Use Interceptor
+    app.useGlobalInterceptors(new ResponseInterceptor());
 
     // Use Logger
     const logger: Logger = app.get(WINSTON_MODULE_NEST_PROVIDER);
