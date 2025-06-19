@@ -19,6 +19,9 @@ async function bootstrap() {
     // Enable helmet
     app.use(helmet());
 
+    // Enable shutdown hook
+    app.enableShutdownHooks();
+
     // Enable Validator
     app.useGlobalPipes(
         new ValidationPipe({

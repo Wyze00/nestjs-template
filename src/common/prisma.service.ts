@@ -1,4 +1,9 @@
-import { Inject, Injectable, OnModuleInit } from '@nestjs/common';
+import {
+    Inject,
+    Injectable,
+    OnApplicationShutdown,
+    OnModuleInit,
+} from '@nestjs/common';
 import { Prisma, PrismaClient } from '@prisma/client';
 import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
 import { Logger } from 'winston';
@@ -6,7 +11,7 @@ import { Logger } from 'winston';
 @Injectable()
 export class PrismaService
     extends PrismaClient<Prisma.PrismaClientOptions, string>
-    implements OnModuleInit
+    implements OnModuleInit, OnApplicationShutdown
 {
     constructor(
         @Inject(WINSTON_MODULE_PROVIDER) private readonly logger: Logger,
@@ -51,5 +56,10 @@ export class PrismaService
         this.$on('warn', (msg: Prisma.LogEvent) => {
             this.logger.warn(msg);
         });
+    }
+
+    async onApplicationShutdown(signal: string) {
+        this.logger.info(`Shutdown App with signal : ${signal}`);
+        await this.$disconnect();
     }
 }
