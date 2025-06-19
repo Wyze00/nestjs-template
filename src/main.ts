@@ -75,8 +75,9 @@ async function bootstrap() {
     const docs = SwaggerModule.createDocument(app, docsConfig);
     SwaggerModule.setup('api', app, docs);
 
+    // Liten
     await app.listen(PORT, () => {
-        console.log(`Application start at : http://${HOST}:${PORT}`);
+        loggerInstance.info(`Application start at : http://${HOST}:${PORT}`);
     });
 }
 bootstrap();
