@@ -8,12 +8,16 @@ import { HttpException, HttpStatus, ValidationPipe } from '@nestjs/common';
 import { ValidationError } from 'class-validator';
 import { ErrorFilter } from './common/filter/error.filter';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import helmet from 'helmet';
 
 async function bootstrap() {
     const app = await NestFactory.create<NestExpressApplication>(AppModule);
 
     // Enable CORS
     app.enableCors();
+
+    // Enable helmet
+    app.use(helmet());
 
     // Enable Validator
     app.useGlobalPipes(
