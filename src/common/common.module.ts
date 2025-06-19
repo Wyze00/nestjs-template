@@ -1,4 +1,14 @@
 import { Module } from '@nestjs/common';
+import { WinstonModule } from 'nest-winston';
+import * as winston from 'winston';
 
-@Module({})
+@Module({
+    imports: [
+        WinstonModule.forRoot({
+            format: winston.format.json(),
+            transports: [new winston.transports.Console()],
+            level: 'debug',
+        }),
+    ],
+})
 export class CommonModule {}
