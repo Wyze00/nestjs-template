@@ -3,7 +3,7 @@ import { NextFunction, Request, Response } from 'express';
 import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
 import { Logger } from 'winston';
 
-export class LoggerMiddlewae implements NestMiddleware {
+export class LoggerMiddleware implements NestMiddleware {
     constructor(
         @Inject(WINSTON_MODULE_PROVIDER) private readonly logger: Logger,
     ) {}

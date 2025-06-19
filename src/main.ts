@@ -1,7 +1,10 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { NestExpressApplication } from '@nestjs/platform-express';
-import { WINSTON_MODULE_NEST_PROVIDER } from 'nest-winston';
+import {
+    WINSTON_MODULE_NEST_PROVIDER,
+    WINSTON_MODULE_PROVIDER,
+} from 'nest-winston';
 import { Logger } from 'winston';
 import { ConfigService } from '@nestjs/config';
 import { HttpException, HttpStatus, ValidationPipe } from '@nestjs/common';
@@ -9,6 +12,7 @@ import { ValidationError } from 'class-validator';
 import { ErrorFilter } from './common/filter/error.filter';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import helmet from 'helmet';
+import { ResponseInterceptor } from './common/interceptor/response.interceptor';
 
 async function bootstrap() {
     const app = await NestFactory.create<NestExpressApplication>(AppModule);
@@ -50,6 +54,10 @@ async function bootstrap() {
 
     // Use Logger
     const logger: Logger = app.get(WINSTON_MODULE_NEST_PROVIDER);
+    const loggerInstance: Logger = app.get(WINSTON_MODULE_PROVIDER);
+
+    // Use Interceptor
+    app.useGlobalInterceptors(new ResponseInterceptor(loggerInstance));
     app.useLogger(logger);
 
     // Configuration
