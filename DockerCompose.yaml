@@ -18,5 +18,5 @@ services:
       - mysql-service-data:/var/lib/mysql
 
 volumes:
-  mysql-service-data
+  mysql-service-data:
   
