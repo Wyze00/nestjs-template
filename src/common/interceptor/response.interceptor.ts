@@ -23,11 +23,15 @@ export class ResponseInterceptor<T> implements NestInterceptor {
     ): Observable<WebResponse<T>> {
         const request: Request = context.switchToHttp().getRequest();
 
-        this.logger.info(`[Request From] : ${request.path}`);
+        this.logger.info(
+            `[Request From] : ${request.path} | Controller ${context.getClass().name} | Handler ${context.getHandler().name} ${request.body ? 'Body :' + JSON.stringify(request.body) : ''}`,
+        );
 
         return next.handle().pipe(
             tap((val: any) => {
-                this.logger.info(`[Response From] ${request.path} : ${val}`);
+                this.logger.info(
+                    `[Response From] ${request.path} : ${JSON.stringify(val)}`,
+                );
             }),
             map((val: T) => ({
                 data: val,
