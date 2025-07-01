@@ -12,3 +12,7 @@ datasource db {
   provider = "mysql"
   url      = env("DATABASE_URL")
 }
+
+model Template {
+  username String @id @db.VarChar(10)
+}
