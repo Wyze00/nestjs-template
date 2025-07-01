@@ -63,7 +63,7 @@ async function bootstrap() {
     // Configuration
     const configService: ConfigService = app.get(ConfigService);
     const PORT = configService.get<number>('PORT') || 3000;
-    const HOST = configService.get<string>('HOST') || 'localhost';
+    const HOST = configService.get<string>('HOST') || '0.0.0.0';
 
     // OpenApi Swagger
     const docsConfig = new DocumentBuilder()
@@ -76,7 +76,7 @@ async function bootstrap() {
     SwaggerModule.setup('api', app, docs);
 
     // Liten
-    await app.listen(PORT, () => {
+    await app.listen(PORT, HOST, () => {
         loggerInstance.info(`Application start at : http://${HOST}:${PORT}`);
     });
 }
