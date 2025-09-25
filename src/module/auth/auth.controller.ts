@@ -13,7 +13,11 @@ import { ApiOkResponse, ApiTags } from '@nestjs/swagger';
 import { TokenResponseDto } from './dto/token-response.dto';
 import { RefreshTokenGuard } from 'src/common/guard/refresh-token.guard';
 import { Request } from 'express';
-import { RefreshTokenPayload } from 'src/common/types/auth.types';
+import {
+    AccessTokenPayload,
+    RefreshTokenPayload,
+} from 'src/common/types/auth.types';
+import { AccessTokenGuard } from 'src/common/guard/access-token.guard';
 
 @ApiTags('auth')
 @Controller('auth')
@@ -40,5 +44,15 @@ export class AuthController {
         const userId: string = user.sub;
         const refreshToken: string = user.refreshToken;
         return this.authService.refreshToken(userId, refreshToken);
+    }
+
+    @ApiOkResponse()
+    @UseGuards(AccessTokenGuard)
+    @Post('logout')
+    @HttpCode(HttpStatus.OK)
+    logout(@Req() req: Request) {
+        const user = req.user as AccessTokenPayload;
+        const userId = user.sub;
+        return this.authService.logout(userId);
     }
 }

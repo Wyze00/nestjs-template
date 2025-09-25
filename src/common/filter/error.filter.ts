@@ -9,8 +9,9 @@ import {
 import { Request, Response } from 'express';
 import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
 import { Logger } from 'winston';
+import { Prisma } from '@prisma/client';
 
-@Catch(HttpException, Error)
+@Catch(Prisma.PrismaClientKnownRequestError, HttpException, Error)
 export class ErrorFilter implements ExceptionFilter {
     constructor(
         @Inject(WINSTON_MODULE_PROVIDER) private readonly logger: Logger,
