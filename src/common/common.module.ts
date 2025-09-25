@@ -5,6 +5,7 @@ import * as winston from 'winston';
 import { PrismaService } from './provider/prisma.service';
 import { JwtModule } from '@nestjs/jwt';
 import { ThrottlerModule } from '@nestjs/throttler';
+import * as Joi from 'joi';
 
 @Global()
 @Module({
@@ -17,6 +18,15 @@ import { ThrottlerModule } from '@nestjs/throttler';
         ConfigModule.forRoot({
             isGlobal: true,
             cache: true,
+            validationSchema: Joi.object({
+                NODE_ENV: Joi.string()
+                    .valid('development', 'production', 'test')
+                    .default('development'),
+                PORT: Joi.number().default(3000),
+                HOST: Joi.string().default('0.0.0.0'),
+                DATABASE_URL: Joi.string().required(),
+                JWT_SECRET: Joi.string().required(),
+            }),
         }),
         JwtModule.registerAsync({
             useFactory: (configService: ConfigService) => {
