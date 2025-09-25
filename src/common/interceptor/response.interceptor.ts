@@ -35,6 +35,8 @@ export class ResponseInterceptor<T> implements NestInterceptor {
             }),
             map((val: T) => ({
                 data: val,
+                timestamp: new Date().toISOString(),
+                path: request.url,
             })),
         );
     }
