@@ -21,6 +21,7 @@ export class AuthService {
 
     async login(loginDto: LoginDto): Promise<TokenDto> {
         const { id, password } = loginDto;
+
         const user: User | null = await this.prismaService.user.findUnique({
             where: { id },
         });
@@ -31,6 +32,7 @@ export class AuthService {
 
         const tokens = await this.generateTokens(user.id);
         await this.updateRefreshToken(user.id, tokens.refreshToken);
+
         return tokens;
     }
 
@@ -57,6 +59,7 @@ export class AuthService {
 
         const tokens = await this.generateTokens(user.id);
         await this.updateRefreshToken(user.id, tokens.refreshToken);
+
         return tokens;
     }
 
