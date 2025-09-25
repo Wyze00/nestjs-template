@@ -24,14 +24,18 @@ export class ErrorFilter implements ExceptionFilter {
             `[Request Error From] ${request.path} : ${exception.message}`,
         );
 
-        if (exception instanceof HttpException) {
-            response.status(exception.getStatus()).json({
-                errors: exception.getResponse(),
-            });
-        } else {
-            response.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
-                errors: exception.message,
-            });
-        }
+        const status: number =
+            exception instanceof HttpException
+                ? exception.getStatus()
+                : HttpStatus.INTERNAL_SERVER_ERROR;
+
+        response.status(status).json({
+            errors:
+                exception instanceof HttpException
+                    ? exception.getResponse()
+                    : exception.message,
+            timestamp: new Date().toISOString(),
+            path: request.url,
+        });
     }
 }
