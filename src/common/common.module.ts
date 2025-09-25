@@ -1,9 +1,8 @@
 import { Global, Module } from '@nestjs/common';
-import { ConfigModule, ConfigService } from '@nestjs/config';
+import { ConfigModule } from '@nestjs/config';
 import { WinstonModule } from 'nest-winston';
 import * as winston from 'winston';
 import { PrismaService } from './provider/prisma.service';
-import { JwtModule } from '@nestjs/jwt';
 import { ThrottlerModule } from '@nestjs/throttler';
 import * as Joi from 'joi';
 
@@ -43,23 +42,24 @@ import * as Joi from 'joi';
                 HOST: Joi.string().default('0.0.0.0'),
                 DATABASE_URL: Joi.string().required(),
                 JWT_SECRET: Joi.string().required(),
+                JWT_REFRESH_SECRET: Joi.string().required(),
             }),
         }),
-        JwtModule.registerAsync({
-            useFactory: (configService: ConfigService) => {
-                const pass =
-                    configService.get<string>('JWT_SECRET') || 'RAHASIA';
+        // JwtModule.registerAsync({
+        //     useFactory: (configService: ConfigService) => {
+        //         const pass =
+        //             configService.get<string>('JWT_SECRET') || 'RAHASIA';
 
-                return {
-                    global: true,
-                    secret: pass,
-                    signOptions: {
-                        expiresIn: '1h',
-                    },
-                };
-            },
-            inject: [ConfigService],
-        }),
+        //         return {
+        //             global: true,
+        //             secret: pass,
+        //             signOptions: {
+        //                 expiresIn: '1h',
+        //             },
+        //         };
+        //     },
+        //     inject: [ConfigService],
+        // }),
         ThrottlerModule.forRoot({
             throttlers: [
                 {

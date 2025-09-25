@@ -1,35 +1,36 @@
 import {
     CanActivate,
     ExecutionContext,
-    HttpException,
-    HttpStatus,
+    Injectable,
+    UnauthorizedException,
 } from '@nestjs/common';
-import { Request } from 'express';
-import { Observable } from 'rxjs';
-import { RequestUser } from '../dto/request-user.dto';
 import { JwtService } from '@nestjs/jwt';
+import { Request } from 'express';
 
+@Injectable()
 export class JwtGuard implements CanActivate {
     constructor(private readonly jwtService: JwtService) {}
 
-    canActivate(
-        context: ExecutionContext,
-    ): boolean | Promise<boolean> | Observable<boolean> {
-        const request: RequestUser = context.switchToHttp().getRequest();
-
-        const token: string | undefined = request.headers.authorization;
-
-        if (token) {
-            if (token.startsWith('Bearer ')) {
-                const jwt = token.split(' ')[1];
-
-                const isValid = this.jwtService.verify<{ user: string }>(jwt);
-
-                request.user = isValid.user;
-                return true;
-            }
+    async canActivate(context: ExecutionContext): Promise<boolean> {
+        const request: Request = context.switchToHttp().getRequest();
+        const token = this.extractTokenFromHeader(request);
+        if (!token) {
+            throw new UnauthorizedException();
         }
+        try {
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+            const payload = await this.jwtService.verifyAsync(token);
+            // Menetapkan payload ke request agar bisa diakses di route handler
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+            request['user'] = payload;
+        } catch {
+            throw new UnauthorizedException();
+        }
+        return true;
+    }
 
-        throw new HttpException('Unauthorized', HttpStatus.UNAUTHORIZED);
+    private extractTokenFromHeader(request: Request): string | undefined {
+        const [type, token] = request.headers.authorization?.split(' ') ?? [];
+        return type === 'Bearer' ? token : undefined;
     }
 }
