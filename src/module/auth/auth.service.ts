@@ -5,10 +5,10 @@ import {
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { PrismaService } from 'src/common/provider/prisma.service';
-import { LoginDto } from './dto/login.dto';
+import { LoginRequestDto } from './dto/login-request.dto';
 import * as bcrypt from 'bcrypt';
 import { ConfigService } from '@nestjs/config';
-import { TokenDto } from './dto/token.dto';
+import { TokenResponseDto } from './dto/token-response.dto';
 import { User } from '@prisma/client';
 
 @Injectable()
@@ -19,8 +19,8 @@ export class AuthService {
         private configService: ConfigService,
     ) {}
 
-    async login(loginDto: LoginDto): Promise<TokenDto> {
-        const { id, password } = loginDto;
+    async login(LoginRequestDto: LoginRequestDto): Promise<TokenResponseDto> {
+        const { id, password } = LoginRequestDto;
 
         const user: User | null = await this.prismaService.user.findUnique({
             where: { id },
@@ -39,7 +39,7 @@ export class AuthService {
     async refreshToken(
         userId: string,
         refreshToken: string,
-    ): Promise<TokenDto> {
+    ): Promise<TokenResponseDto> {
         const user = await this.prismaService.user.findUnique({
             where: { id: userId },
         });
@@ -71,7 +71,7 @@ export class AuthService {
         });
     }
 
-    private async generateTokens(userId: string): Promise<TokenDto> {
+    private async generateTokens(userId: string): Promise<TokenResponseDto> {
         const payload = { sub: userId };
 
         const [accessToken, refreshToken] = await Promise.all([

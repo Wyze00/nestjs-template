@@ -8,12 +8,12 @@ import {
     Req,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
-import { LoginDto } from './dto/login.dto';
+import { LoginRequestDto } from './dto/login-request.dto';
 import { ApiTags } from '@nestjs/swagger';
-import { TokenDto } from './dto/token.dto';
+import { TokenResponseDto } from './dto/token-response.dto';
 import { RefreshTokenGuard } from 'src/common/guard/refresh-token.guard';
 import { Request } from 'express';
-import { JwtPayload } from 'src/common/types/jwt-payload.type';
+import { RefreshTokenPayload } from 'src/common/types/auth.types';
 
 @ApiTags('auth')
 @Controller('auth')
@@ -22,17 +22,17 @@ export class AuthController {
 
     @HttpCode(HttpStatus.OK)
     @Post('login')
-    login(@Body() loginDto: LoginDto): Promise<TokenDto> {
+    login(@Body() loginDto: LoginRequestDto): Promise<TokenResponseDto> {
         return this.authService.login(loginDto);
     }
 
     @UseGuards(RefreshTokenGuard)
     @Post('refresh')
     @HttpCode(HttpStatus.OK)
-    refreshToken(@Req() req: Request): Promise<TokenDto> {
-        const user = req.user as JwtPayload;
+    refreshToken(@Req() req: Request): Promise<TokenResponseDto> {
+        const user = req.user as RefreshTokenPayload;
         const userId: string = user.sub;
-        const refreshToken: string = user.refreshToken!;
+        const refreshToken: string = user.refreshToken;
         return this.authService.refreshToken(userId, refreshToken);
     }
 }

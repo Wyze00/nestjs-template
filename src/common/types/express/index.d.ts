@@ -1,5 +1,5 @@
 // src/common/types/express/index.d.ts
-import { JwtPayload } from '../jwt-payload.type';
+import { JwtPayload } from '../auth.types';
 
 declare global {
     namespace Express {
