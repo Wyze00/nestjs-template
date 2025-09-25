@@ -1,15 +1,26 @@
-FROM node:20
-
+# ---- Builder Stage ----
+FROM node:20-alpine AS builder
 WORKDIR /app
-
-COPY package*.json .
-
-RUN npm i
-
+COPY package*.json ./
+RUN npm install
 COPY . .
-COPY .env.docker /app/.env
-
-RUN npx prisma generate
 RUN npm run build
 
-CMD npx prisma migrate deploy && npm run start
+# ---- Production Stage ----
+FROM node:20-alpine
+WORKDIR /app
+# Buat pengguna non-root
+RUN addgroup -S appgroup && adduser -S appuser -G appgroup
+USER appuser
+
+# Salin hanya artifact yang diperlukan
+COPY --from=builder /app/dist ./dist
+COPY --from=builder /app/node_modules ./node_modules
+COPY --from=builder /app/prisma ./prisma
+COPY .env.docker ./.env
+
+# Pastikan Prisma client sudah digenerate
+RUN npx prisma generate
+
+EXPOSE 3000
+CMD ["node", "dist/main"]
